@@ -1,0 +1,243 @@
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Car {
+    private String licensePlate;
+    private String model;
+    private boolean isRented;
+
+    public Car(String licensePlate, String model) {
+        this.licensePlate = licensePlate;
+        this.model = model;
+        this.isRented = false;
+    }
+
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public boolean isRented() {
+        return isRented;
+    }
+
+    public void rentCar() {
+        this.isRented = true;
+    }
+
+    public void returnCar() {
+        this.isRented = false;
+    }
+
+    @Override
+    public String toString() {
+        return "Car [License Plate=" + licensePlate + ", Model=" + model + ", Is Rented=" + isRented + "]";
+    }
+}
+
+class Customer {
+    private String userId;
+    private String name;
+
+    public Customer(String userId, String name) {
+        this.userId = userId;
+        this.name = name;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Customer [User ID=" + userId + ", Name=" + name + "]";
+    }
+}
+
+class Rental {
+    private Customer customer;
+    private Car car;
+    private LocalDate rentalDate;
+    private LocalDate returnDate;
+
+    public Rental(Customer customer, Car car, LocalDate rentalDate, LocalDate returnDate) {
+        this.customer = customer;
+        this.car = car;
+        this.rentalDate = rentalDate;
+        this.returnDate = returnDate;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public Car getCar() {
+        return car;
+    }
+
+    public LocalDate getRentalDate() {
+        return rentalDate;
+    }
+
+    public LocalDate getReturnDate() {
+        return returnDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Rental [Customer=" + customer + ", Car=" + car + ", Rental Date=" + rentalDate + ", Return Date=" + returnDate + "]";
+    }
+}
+
+public class CarRentalSystem {
+    private List<Car> cars;
+    private List<Customer> customers;
+    private List<Rental> rentals;
+
+    public CarRentalSystem() {
+        cars = new ArrayList<>();
+        customers = new ArrayList<>();
+        rentals = new ArrayList<>();
+    }
+
+    public void addCar(String licensePlate, String model) {
+        cars.add(new Car(licensePlate, model));
+    }
+
+    public void registerCustomer(String userId, String name) {
+        customers.add(new Customer(userId, name));
+    }
+
+    public void rentCar(String userId, String licensePlate, LocalDate rentalDate, LocalDate returnDate) {
+        Customer customer = findCustomerById(userId);
+        Car car = findCarByLicensePlate(licensePlate);
+
+        if (customer != null && car != null && !car.isRented()) {
+            car.rentCar();
+            rentals.add(new Rental(customer, car, rentalDate, returnDate));
+            System.out.println("Car rented successfully.");
+        } else {
+            System.out.println("Car rental failed. Either the car is already rented or customer/car does not exist.");
+        }
+    }
+
+    public void returnCar(String licensePlate) {
+        Car car = findCarByLicensePlate(licensePlate);
+
+        if (car != null && car.isRented()) {
+            car.returnCar();
+            System.out.println("Car returned successfully.");
+        } else {
+            System.out.println("Car return failed. The car is not currently rented.");
+        }
+    }
+
+    public void listCars() {
+        for (Car car : cars) {
+            System.out.println(car);
+        }
+    }
+
+    public void listCustomers() {
+        for (Customer customer : customers) {
+            System.out.println(customer);
+        }
+    }
+
+    public void listRentals() {
+        for (Rental rental : rentals) {
+            System.out.println(rental);
+        }
+    }
+
+    private Customer findCustomerById(String userId) {
+        for (Customer customer : customers) {
+            if (customer.getUserId().equals(userId)) {
+                return customer;
+            }
+        }
+        return null;
+    }
+
+    private Car findCarByLicensePlate(String licensePlate) {
+        for (Car car : cars) {
+            if (car.getLicensePlate().equals(licensePlate)) {
+                return car;
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        CarRentalSystem system = new CarRentalSystem();
+        Scanner scanner = new Scanner(System.in);
+
+        // Adding some cars
+        system.addCar("ABC123", "Toyota Corolla");
+        system.addCar("XYZ789", "Honda Civic");
+
+        // Registering some customers
+        system.registerCustomer("U001", "John Doe");
+        system.registerCustomer("U002", "Jane Smith");
+
+        while (true) {
+            System.out.println("\nCar Rental System Menu:");
+            System.out.println("1. NUMBER OF CARR");
+            System.out.println("2. List Customers");
+            System.out.println("3. List Rentals");
+            System.out.println("4. Rent a Car");
+            System.out.println("5. Return a Car");
+            System.out.println("6. Exit");
+            System.out.print("Choose : ");
+            int option = scanner.nextInt();
+            scanner.nextLine();  // Consume newline
+
+            switch (option) {
+                case 1:
+                    System.out.println("Cars in the system:");
+                    system.listCars();
+                    break;
+                case 2:
+                    System.out.println("Customers in the system:");
+                    system.listCustomers();
+                    break;
+                case 3:
+                    System.out.println("Rentals in the system:");
+                    system.listRentals();
+                    break;
+                case 4:
+                    System.out.print("Enter Customer ID: ");
+                    String userId = scanner.nextLine();
+                    System.out.print("Enter Car License Plate: ");
+                    String licensePlate = scanner.nextLine();
+                    System.out.print("Enter Rental Date (YYYY-MM-DD): ");
+                    LocalDate rentalDate = LocalDate.parse(scanner.nextLine());
+                    System.out.print("Enter Return Date (YYYY-MM-DD): ");
+                    LocalDate returnDate = LocalDate.parse(scanner.nextLine());
+                    system.rentCar(userId, licensePlate, rentalDate, returnDate);
+                    break;
+                case 5:
+                    System.out.print("Enter Car License Plate: ");
+                    licensePlate = scanner.nextLine();
+                    system.returnCar(licensePlate);
+                    break;
+                case 6:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+                    break;
+            }
+        }
+    }
+}
