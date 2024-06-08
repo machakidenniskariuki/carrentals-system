@@ -1,0 +1,10 @@
+Features
+Add cars to the system with license plate and model details.
+Register customers with user IDs and names.
+Rent cars to customers for specific rental periods.
+Return cars that are currently rented.
+View lists of cars, customers, and rentals in the system.
+Usage
+Clone the repository or download the source code.
+Compile the Java files: javac CarRentalSystem.java
+Run the program: java CarRentalSystem
